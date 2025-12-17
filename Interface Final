@@ -11,7 +11,6 @@ public class Interface {
 
     private static List<Aluno> alunos = new ArrayList<>();
     private static List<Professor> professores = new ArrayList<>();
-    //private static List<Turma> turmas = new ArrayList<>();
     private static List<Diario> diarios = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -124,12 +123,8 @@ public class Interface {
 
         int opcao = Integer.parseInt(sc.nextLine());
 
-        CalcularMedia tipoMedia;
-        if (opcao == 2) {
-            tipoMedia = new MediaPonderada();
-        } else {
-            tipoMedia = new MediaAritmetica();
-        }
+        CalcularMedia tipoMedia =
+                opcao == 2 ? new MediaPonderada() : new MediaAritmetica();
 
         Diario diario = new Diario(codigo, tipoMedia);
 
@@ -139,7 +134,7 @@ public class Interface {
         diario.setProfessorRegente(professor);
 
         diarios.add(diario);
-
+        
         System.out.println("Diário criado com sucesso.");
     }
     
@@ -242,4 +237,3 @@ public class Interface {
         }
     }
 }
-  
