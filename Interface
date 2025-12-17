@@ -37,7 +37,7 @@ public class Interface {
                 case 1 -> cadastrarAluno(sc);
                 case 2 -> cadastrarProfessor(sc);
                 case 3 -> cadastrarTurma(sc);
-                case 4 -> atribuirAlunoDisciplina(sc);
+                case 4 -> atribuirDisciplinaAluno(sc);
                 case 5 -> cadastrarAlunoTurma(sc);
                 case 6 -> criarDiario(sc);
                 case 7 -> lancarNotas(sc);
@@ -94,18 +94,21 @@ public class Interface {
     }
 
     // ---------------- DISCIPLINA ----------------
-    private static void atribuirAlunoDisciplina(Scanner sc) {
+    private static void atribuirDisciplinaAluno(Scanner sc) {
+
         Aluno aluno = selecionarAluno(sc);
         if (aluno == null) return;
 
-        System.out.print("Nome da disciplina: ");
-        String nome = sc.nextLine();
+        System.out.print("Nome da Disciplina: ");
+        String nomeDisciplina = sc.nextLine();
 
         Professor professor = selecionarProfessor(sc);
         if (professor == null) return;
 
-        aluno.adicionarDisciplina(new Disciplina(nome, professor));
-        System.out.println("Disciplina atribuída.");
+        Disciplina disciplina = new Disciplina(nomeDisciplina, professor);
+        aluno.adicionarDisciplina(disciplina);
+
+        System.out.println("Disciplina adicionada ao aluno com sucesso.");
     }
 
     // ---------------- DIÁRIO ----------------
