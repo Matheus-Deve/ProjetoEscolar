@@ -1,0 +1,245 @@
+package novo;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Interface {
+
+    private static List<Aluno> alunos = new ArrayList<>();
+    private static List<Professor> professores = new ArrayList<>();
+    //private static List<Turma> turmas = new ArrayList<>();
+    private static List<Diario> diarios = new ArrayList<>();
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        int opcao;
+
+        do {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1 - Cadastrar Aluno");
+            System.out.println("2 - Cadastrar Professor");
+            System.out.println("3 - Criar Diário");
+            System.out.println("4 - Adicionar Aluno ao Diário ");
+            System.out.println("5 - Atribuir Disciplina a Aluno");
+            System.out.println("6 - Lançar Notas");
+            System.out.println("7 - Exibir Diário");
+            System.out.println("0 - Sair");
+
+            opcao = Integer.parseInt(sc.nextLine());
+
+            switch (opcao) {
+                case 1 -> cadastrarAluno(sc);
+                case 2 -> cadastrarProfessor(sc);
+                case 3 -> criarDiario(sc);
+                case 4 -> adicionarAlunoAoDiario(sc);
+                case 5 -> atribuirDisciplinaAluno(sc);
+                case 6 -> lancarNotas(sc);
+                case 7 -> exibirDiario();
+            }
+
+        } while (opcao != 0);
+
+        sc.close();
+    }
+
+    // ---------------- ALUNO ----------------
+    private static void cadastrarAluno(Scanner sc) {
+        System.out.print("Matrícula: ");
+        String matricula = sc.nextLine();
+
+        System.out.print("Nome: ");
+        String nome = sc.nextLine();
+
+        LocalDate nasc = lerData(sc, "Nascimento (dd/MM/yyyy): ");
+        alunos.add(new Aluno(matricula, nome, nasc));
+    }
+
+    // ---------------- PROFESSOR ----------------
+    private static void cadastrarProfessor(Scanner sc) {
+        System.out.print("SIAPE: ");
+        String siape = sc.nextLine();
+
+        System.out.print("Formação: ");
+        String formacao = sc.nextLine();
+
+        System.out.print("Nome: ");
+        String nome = sc.nextLine();
+
+        LocalDate nasc = lerData(sc, "Nascimento (dd/MM/yyyy): ");
+        professores.add(new Professor(siape, formacao, nome, nasc));
+    }
+
+
+    // ---------------- DISCIPLINA ----------------
+    private static void atribuirDisciplinaAluno(Scanner sc) {
+
+        Aluno aluno = selecionarAluno(sc);
+        if (aluno == null) return;
+
+        System.out.print("Nome da Disciplina: ");
+        String nomeDisciplina = sc.nextLine();
+
+        Professor professor = selecionarProfessor(sc);
+        if (professor == null) return;
+
+        Disciplina disciplina = new Disciplina(nomeDisciplina, professor);
+        aluno.adicionarDisciplina(disciplina);
+
+        System.out.println("Disciplina adicionada ao aluno com sucesso.");
+    }
+    
+    
+    private static Disciplina selecionarDisciplina(Aluno aluno, Scanner sc) {
+
+        List<Disciplina> disciplinas = aluno.getDisciplinasCursadas();
+
+        if (disciplinas.isEmpty()) {
+            System.out.println("O aluno não possui disciplinas.");
+            return null;
+        }
+
+        System.out.println("Selecione a disciplina:");
+        for (int i = 0; i < disciplinas.size(); i++) {
+            System.out.println(i + " - " + disciplinas.get(i).getNome());
+        }
+
+        int opcao = Integer.parseInt(sc.nextLine());
+        return disciplinas.get(opcao);
+    }
+
+    // ---------------- DIÁRIO ----------------
+    private static void criarDiario(Scanner sc) {
+
+        System.out.print("Código do Diário: ");
+        String codigo = sc.nextLine();
+
+        System.out.println("Tipo de média:");
+        System.out.println("1 - Média Aritmética");
+        System.out.println("2 - Média Ponderada");
+
+        int opcao = Integer.parseInt(sc.nextLine());
+
+        CalcularMedia tipoMedia;
+        if (opcao == 2) {
+            tipoMedia = new MediaPonderada();
+        } else {
+            tipoMedia = new MediaAritmetica();
+        }
+
+        Diario diario = new Diario(codigo, tipoMedia);
+
+        Professor professor = selecionarProfessor(sc);
+        if (professor == null) return;
+
+        diario.setProfessorRegente(professor);
+
+        diarios.add(diario);
+
+        System.out.println("Diário criado com sucesso.");
+    }
+    
+    private static void adicionarAlunoAoDiario(Scanner sc) {
+
+        Diario diario = selecionarDiario(sc);
+        if (diario == null) return;
+
+        Aluno aluno = selecionarAluno(sc);
+        if (aluno == null) return;
+        
+        if (diario.getAlunos().contains(aluno)) {
+            System.out.println("Aluno já está no diário.");
+            return;
+        }
+        
+        diario.adicionarAluno(aluno);
+
+        System.out.println("Aluno adicionado ao diário com sucesso.");
+    }
+
+
+    private static void lancarNotas(Scanner sc) {
+
+        Aluno aluno = selecionarAluno(sc);
+        if (aluno == null) return;
+
+        Disciplina disciplina = selecionarDisciplina(aluno, sc);
+        if (disciplina == null) return;
+
+        System.out.print("Quantas notas? ");
+        int qtd = Integer.parseInt(sc.nextLine());
+
+        double[] notas = new double[qtd];
+
+        for (int i = 0; i < qtd; i++) {
+            System.out.print("Nota " + (i + 1) + ": ");
+            notas[i] = Double.parseDouble(sc.nextLine());
+        }
+
+        Diario diario = selecionarDiario(sc);
+        if (diario == null) return;
+
+        diario.calcularEAtualizarMedia(aluno, disciplina.getNome(), notas);
+
+        System.out.println("Notas lançadas com sucesso.");
+    }
+
+    private static void exibirDiario() {
+        for (Diario d : diarios) {
+            System.out.println("\nProfessor: " + d.getProfessorRegente().getNome());
+
+            for (Aluno a : d.getAlunos()) {
+                System.out.println("Aluno: " + a.getNome());
+
+                for (Disciplina disc : a.getDisciplinasCursadas()) {
+                    System.out.println(
+                        "Disciplina: " + disc.getNome() +
+                        " | Média: " + disc.getMedia() +
+                        " | Situação: " +
+                        (disc.isAprovacao() ? "Aprovado" : "Reprovado")
+                    );
+                }
+            }
+        }
+    }
+
+    // ---------------- SELETORES ----------------
+    private static Aluno selecionarAluno(Scanner sc) {
+        if (alunos.isEmpty()) return null;
+        for (int i = 0; i < alunos.size(); i++)
+            System.out.println(i + " - " + alunos.get(i).getNome());
+        return alunos.get(Integer.parseInt(sc.nextLine()));
+    }
+
+    private static Professor selecionarProfessor(Scanner sc) {
+        if (professores.isEmpty()) return null;
+        for (int i = 0; i < professores.size(); i++)
+            System.out.println(i + " - " + professores.get(i).getNome());
+        return professores.get(Integer.parseInt(sc.nextLine()));
+    }
+
+    private static Diario selecionarDiario(Scanner sc) {
+        if (diarios.isEmpty()) return null;
+        for (int i = 0; i < diarios.size(); i++)
+            System.out.println(i + " - " + diarios.get(i).getProfessorRegente().getNome());
+        return diarios.get(Integer.parseInt(sc.nextLine()));
+    }
+
+    // ---------------- DATA ----------------
+    private static LocalDate lerData(Scanner sc, String msg) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        while (true) {
+            try {
+                System.out.print(msg);
+                return LocalDate.parse(sc.nextLine(), fmt);
+            } catch (DateTimeParseException e) {
+                System.out.println("Data inválida.");
+            }
+        }
+    }
+}
+  
