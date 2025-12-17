@@ -24,7 +24,7 @@ public class Interface {
             System.out.println("1 - Cadastrar Aluno");
             System.out.println("2 - Cadastrar Professor");
             System.out.println("3 - Cadastrar Turma");
-            System.out.println("4 - Atribuir Aluno a Disciplina");
+            System.out.println("4 - Atribuir Disciplina a Aluno");
             System.out.println("5 - Cadastrar Aluno em Turma");
             System.out.println("6 - Criar Diário");
             System.out.println("7 - Lançar Notas");
