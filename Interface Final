@@ -132,7 +132,6 @@ public class Interface {
         if (professor == null) return;
 
         diario.setProfessorRegente(professor);
-
         diarios.add(diario);
         
         System.out.println("Diário criado com sucesso.");
@@ -163,9 +162,13 @@ public class Interface {
         if (diario == null) return;
         
         
-        Aluno aluno = selecionarAluno(sc);
-        if (aluno == null) return;
-
+        for (int i=0; i < diario.getAlunos().size(); i++) 
+        	System.out.println(i + " - " + diario.getAlunos().get(i).getNome());
+            Aluno aluno = diario.getAlunos().get(Integer.parseInt(sc.nextLine()));
+        
+            if (aluno == null) return;
+        
+        
         Disciplina disciplina = selecionarDisciplina(aluno, sc);
         if (disciplina == null) return;
 
@@ -267,3 +270,7 @@ public class Interface {
         }
     }
 }
+
+
+
+
